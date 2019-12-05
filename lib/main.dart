@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_app_test/data/entity/cards.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:flutter/material.dart';
 import 'package:flutter_app_test/router/router.dart';
-import 'ui/card/products_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,8 +29,6 @@ final responseData = [
   },
 ];
 
-var data;
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -57,44 +52,107 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  static String pageDescription =
+  static const String pageDescription =
       'Lorem ipsum dolor sit amet, dolor sit amet Lorem '
       'ipsum dolor sit am ipsum dolor sit amet, dolor sit amet';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+//      appBar: AppBar(
+//        backgroundColor: Colors.white,
+//        elevation: 0,
+////        leading: Row(
+////        children: <Widget>[
+////          FloatingActionButton: FloatingActionButton.extended(onPressed: null, label: null)
+////        ],
+////        ),
+//      ),
+      body: SafeArea(
+        top: true,
+        child: Column(
+//          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Image.network(
+                'https://cdn.dribbble.com/users/65767/screenshots/4935267/peter_deltondo_unfold_crowdrise_gofundme_pricing_illustrations.gif'),
+            Container(
+              color: Colors.blue,
+              padding: EdgeInsets.all(20.0),
+              child:
+                  Text(pageDescription, style: TextStyle(color: Colors.white)),
+            ),
+            Flexible(
+                fit: FlexFit.tight,
+                flex: 1,
+                child: _buildCardsListHorizontal(context))
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(top: 150),
+        child: FloatingActionButton.extended(
+            onPressed: _onButtonPress,
+            elevation: 10.0,
+            label: Text('Menu'),
+            icon: Icon(Icons.menu)),
+      ),
+    );
+  }
 
   void _onButtonPress() {
     print('Clicked');
   }
 
-  void _navigateToScreen(data) {
+  void _navigateToScreen(dynamic data) {
     final String id = data['id'];
-    print('another screen $id');
     Navigator.pushNamed(context, 'card-view', arguments: id);
   }
 
-  Widget _buildCardsListHorisontal(BuildContext context) {
+  Widget _buildCardsListHorizontal(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
       stream: Firestore.instance.collection('cards').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return CircularProgressIndicator();
+      builder: (context, AsyncSnapshot<QuerySnapshot> asyncSnapshot) {
+        if (!asyncSnapshot.hasData) return CircularProgressIndicator();
 
-        return _buildList(context, snapshot.data.documents);
+        return _buildList(context, asyncSnapshot.data.documents);
       },
     );
   }
 
   Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
-    data = snapshot;
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: snapshot.length,
-      itemBuilder: _createCardItem,
+      itemBuilder: (context, index) =>
+          _createCardItem(context, snapshot[index]),
     );
   }
 
-  Widget _createCardItem(BuildContext context, int index) {
+  Widget _buildList2(BuildContext context, List<DocumentSnapshot> snapshots) {
+    return ListView(
+      scrollDirection: Axis.horizontal,
+      children: <Widget>[
+        for (var snapshot in snapshots) _createCardItem(context, snapshot)
+      ],
+    );
+  }
+
+  Widget _buildList3(BuildContext context, List<DocumentSnapshot> snapshots) {
+    return ListView(
+      scrollDirection: Axis.horizontal,
+      children: snapshots
+          .map((snapshot) => _createCardItem(context, snapshot))
+          .toList(),
+    );
+  }
+
+  Widget _createCardItem(BuildContext context, DocumentSnapshot snapshot) {
     Size size = MediaQuery.of(context).size;
 
-    final card = data[index];
+    Map<String, dynamic> card = snapshot.data;
+
     final cardId = card['id'];
     final title = card['title'];
     final description = card['description'];
@@ -140,59 +198,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-//      appBar: AppBar(
-//        backgroundColor: Colors.white,
-//        elevation: 0,
-////        leading: Row(
-////        children: <Widget>[
-////          FloatingActionButton: FloatingActionButton.extended(onPressed: null, label: null)
-////        ],
-////        ),
-//      ),
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-
-      body: SafeArea(
-        top: true,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Image.network(
-                'https://cdn.dribbble.com/users/65767/screenshots/4935267/peter_deltondo_unfold_crowdrise_gofundme_pricing_illustrations.gif'),
-            Container(
-              color: Colors.blue,
-              padding: EdgeInsets.all(20.0),
-              child:
-                  Text(pageDescription, style: TextStyle(color: Colors.white)),
-            ),
-            Flexible(
-                fit: FlexFit.tight,
-                flex: 1,
-                child: _buildCardsListHorisontal(context))
-          ],
-        ),
-      ),
-//      floatingActionButton: FloatingActionButton(
-//        onPressed: _incrementCounter,
-//        tooltip: 'Increment',
-//        child: Icon(Icons.add),
-//      ), // This trailing comma makes auto-formatting nicer for build methods.
-
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(top: 150),
-        child: FloatingActionButton.extended(
-            onPressed: _onButtonPress,
-            elevation: 10.0,
-            label: Text('Menu'),
-            icon: Icon(Icons.menu)),
       ),
     );
   }
