@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_app_test/router/router.dart';
 
 void main() {
@@ -59,35 +60,26 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-//      appBar: AppBar(
-//        backgroundColor: Colors.white,
-//        elevation: 0,
-////        leading: Row(
-////        children: <Widget>[
-////          FloatingActionButton: FloatingActionButton.extended(onPressed: null, label: null)
-////        ],
-////        ),
-//      ),
+//      resizeToAvoidBottomInset: true,
       body: SafeArea(
         top: true,
-        child: Column(
-//          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Image.network(
-                'https://cdn.dribbble.com/users/65767/screenshots/4935267/peter_deltondo_unfold_crowdrise_gofundme_pricing_illustrations.gif'),
-            Container(
-              color: Colors.blue,
-              padding: EdgeInsets.all(20.0),
-              child:
-                  Text(pageDescription, style: TextStyle(color: Colors.white)),
-            ),
-            Flexible(
-                fit: FlexFit.tight,
-                flex: 1,
-                child: _buildCardsListHorizontal(context))
-          ],
-        ),
+        child: ListView(children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Image.network(
+                  'https://cdn.dribbble.com/users/65767/screenshots/4935267/peter_deltondo_unfold_crowdrise_gofundme_pricing_illustrations.gif'),
+              Container(
+                color: Colors.blue,
+                padding: EdgeInsets.all(20.0),
+                child: Text(pageDescription,
+                    style: TextStyle(color: Colors.white)),
+              ),
+              _buildCardsListHorizontal(context)
+            ],
+          ),
+        ]),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
       floatingActionButton: Padding(
@@ -105,8 +97,8 @@ class _MyHomePageState extends State<MyHomePage> {
     print('Clicked');
   }
 
-  void _navigateToScreen(dynamic data) {
-    final String id = data['id'];
+  void _navigateToScreen(dynamic cardId) {
+    final String id = cardId;
     Navigator.pushNamed(context, 'card-view', arguments: id);
   }
 
@@ -122,11 +114,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: snapshot.length,
-      itemBuilder: (context, index) =>
-          _createCardItem(context, snapshot[index]),
+    return Container(
+      height: 250,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: snapshot.length,
+        itemBuilder: (context, index) =>
+            _createCardItem(context, snapshot[index]),
+      ),
     );
   }
 
@@ -153,7 +148,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     Map<String, dynamic> card = snapshot.data;
 
-    final cardId = card['id'];
+//    print(snapshot.documentID);
+
+    final cardId = snapshot.documentID;
     final title = card['title'];
     final description = card['description'];
     final image = card['image'];
@@ -162,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
       height: 150,
       width: 200,
       child: GestureDetector(
-        onTap: () => _navigateToScreen(card),
+        onTap: () => _navigateToScreen(cardId),
         child: Card(
           elevation: 5,
           semanticContainer: true,
