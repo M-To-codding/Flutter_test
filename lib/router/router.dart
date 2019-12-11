@@ -13,7 +13,7 @@ Route<dynamic> generateRoutes(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) {
           return ProductsScreen(
-            id: args,
+            screen_id: args,
           );
         },
       );
