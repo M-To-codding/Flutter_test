@@ -3,32 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_app_test/router/router.dart';
 
+import 'db/mock_products_creator.dart';
+
 void main() {
+//  MockProductsCreator();
   runApp(MyApp());
 }
-
-final responseData = [
-  {
-    'id': '0',
-    'image':
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-HeAGHxsU59NboZMUGVv1brzAkPZDj635WR2ksbN66Sp92AlD&s',
-    'title': 'Lorem ipsum',
-    'description': 'dolor sit amet'
-  },
-  {
-    'id': '1',
-    'image':
-        'https://abduzeedo.com/sites/default/files/styles/home_cover/public/originals/06993c70009113.5b9573e708e46.png?itok=Xpr1snbS',
-    'title': 'Lorem ipsum',
-    'description': 'dolor sit amet'
-  },
-  {
-    'id': '2',
-    'image': 'https://miro.medium.com/max/3200/1*QBxc5-QaDrLZV9VPHcqG0Q.png',
-    'title': 'Lorem ipsum',
-    'description': 'dolor sit amet'
-  },
-];
 
 class MyApp extends StatelessWidget {
   @override
@@ -148,8 +128,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     Map<String, dynamic> card = snapshot.data;
 
-//    print(snapshot.documentID);
-
     final cardId = snapshot.documentID;
     final title = card['title'];
     final description = card['description'];
@@ -199,21 +177,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-//class CardsList {
-//  final String title;
-//  final String description;
-//  final String image;
-//  final List<Card> listWithCards;
-//
-//  CardsList.mapCards(Map<String, dynamic> data)
-//      : assert(data['title'] != null),
-//        assert(data['description'] != null),
-//        assert(data['image'] != null),
-//        title = data['title'],
-//        description = data['description'],
-//        image = data['image'];
-//
-//  listWithCards.add(Card(title, description, image));
-//
-//}
